@@ -1,0 +1,9 @@
+name: ShopkeepersStandardization
+version: '${project.version}'
+main: com.ghostchu.plugins.skstandardization.ShopkeepersStandardization
+api-version: '1.20'
+depend:
+  - Shopkeepers
+#commands:
+#  skstandardization:
+#    usage: /skstandardization
