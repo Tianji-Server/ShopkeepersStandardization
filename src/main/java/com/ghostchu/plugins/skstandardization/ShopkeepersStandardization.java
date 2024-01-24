@@ -11,15 +11,20 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 public final class ShopkeepersStandardization extends JavaPlugin implements Listener {
 
@@ -44,11 +49,8 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
         }
         Shopkeeper shopkeeper = event.getShopkeeper();
         Player player = event.getPlayer();
-        this.updateShopItems(shopkeeper, player);
-    }
 
-    private void updateShopItems(Shopkeeper shopkeeper, Player player) {
-        List<ItemStack> shopItems = new ArrayList<>(); // 等待检查列表
+        Set<ItemStack> shopItems = new LinkedHashSet<>(); // 等待检查列表
         for (TradingRecipe recipe : shopkeeper.getTradingRecipes(player)) {
             shopItems.add(recipe.getResultItem().copy());
             shopItems.add(recipe.getItem1().copy());
@@ -56,11 +58,32 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
                 shopItems.add(recipe.getItem2().copy());
             }
         }
+
+        this.updateShopItems(shopItems, player, shopkeeper.getName());
+    }
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    public void onVillagerUI(PlayerInteractEntityEvent event){
+        if(!(event.getRightClicked() instanceof Villager villager)){
+            return;
+        }
+        Set<ItemStack> shopItems = new LinkedHashSet<>(); // 等待检查列表
+        for (MerchantRecipe recipe : villager.getRecipes()) {
+            shopItems.add(recipe.getResult());
+            shopItems.addAll(recipe.getIngredients());
+            if(recipe.getAdjustedIngredient1() != null){
+                shopItems.add(recipe.getAdjustedIngredient1());
+            }
+        }
+        this.updateShopItems(shopItems, event.getPlayer(), event.getRightClicked().getName());
+    }
+
+    private void updateShopItems(Set<ItemStack> adaptList, Player player, String name) {
+
         boolean anyUpdate = false;
         int i = 0;
         for (ItemStack storageContent : player.getInventory().getStorageContents()) {
             if (storageContent == null) continue;
-            for (ItemStack shopItem : shopItems) {
+            for (ItemStack shopItem : adaptList) {
                 if (isStandardSimilar(storageContent, shopItem)) { // 标准检查下相同的话
                     if (!storageContent.isSimilar(shopItem)) { // 但非标准检查并不相同
                         // 同步玩家背包中的物品的 NBT 数据和商店的保持同步
@@ -74,7 +97,7 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
         if (anyUpdate) {
             player.updateInventory();
             player.sendMessage(MiniMessage.miniMessage().deserialize(String.format(getConfig().getString("items-updated"), i)));
-            getLogger().info("更新了玩家 "+player.getName()+" 的 "+i+" 个物品，以修复和 "+shopkeeper.getName()+" 的交易");
+            getLogger().info("更新了玩家 "+player.getName()+" 的 "+i+" 个物品，以修复和 "+name+" 的交易");
         }
     }
 
