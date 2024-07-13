@@ -134,11 +134,13 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
             if (!meta1.getDisplayName().equals(meta2.getDisplayName())) {
                 return false;
             }
+            System.out.println("[DEBUG] TEST9 " + meta1.getDisplayName() + "AND" + meta2.getDisplayName());
         }
         if (meta1.getLore() != null && meta2.getLore() != null) {
             if (!meta1.getLore().equals(meta2.getLore())) {
                 return false;
             }
+            System.out.println("[DEBUG] TEST10 " + meta1.getLore() + "AND" + meta2.getLore());
         }
         return true;
     }
