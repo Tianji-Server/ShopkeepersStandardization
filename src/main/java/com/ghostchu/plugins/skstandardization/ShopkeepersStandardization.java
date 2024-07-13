@@ -7,6 +7,7 @@ import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -136,12 +137,19 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
             }
             System.out.println("[DEBUG] TEST9 " + meta1.getDisplayName() + " AND " + meta2.getDisplayName());
         }
-        if (meta1.getLore() != null && meta2.getLore() != null) {
-            System.out.println("[DEBUG] TEST10 " + meta1.getLore() + " AND " + meta2.getLore());
-            if (!meta1.getLore().equals(meta2.getLore())) {
+        List<String> lore1 = meta1.getLore();
+        List<String> lore2 = meta2.getLore();
+        if (lore1 != null && lore2 != null) {
+            lore1.replaceAll(ChatColor::stripColor);
+            lore2.replaceAll(ChatColor::stripColor);
+            System.out.println("[DEBUG] TEST10 " + lore1 + " AND " + lore2);
+            if (!lore1.equals(lore2)) {
                 return false;
             }
             System.out.println("[DEBUG] TEST11");
+        }
+        if (!meta1.getItemFlags().equals(meta2.getItemFlags())) {
+            return false;
         }
         return true;
     }
