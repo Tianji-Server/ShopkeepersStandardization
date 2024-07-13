@@ -7,6 +7,7 @@ import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -44,9 +45,11 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
 
     @EventHandler(ignoreCancelled = true)
     public void onShopkeeperOpening(ShopkeeperOpenUIEvent event) {
+        System.out.println("[DEBUG] TEST1");
         if (!DefaultUITypes.TRADING().equals(event.getUIType())) {
             return;
         }
+        System.out.println("[DEBUG] TEST2");
         Shopkeeper shopkeeper = event.getShopkeeper();
         Player player = event.getPlayer();
 
@@ -63,9 +66,11 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
     }
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onVillagerUI(PlayerInteractEntityEvent event){
+        System.out.println("[DEBUG] TEST3");
         if(!(event.getRightClicked() instanceof Villager villager)){
             return;
         }
+        System.out.println("[DEBUG] TEST4");
         Set<ItemStack> shopItems = new LinkedHashSet<>(); // 等待检查列表
         for (MerchantRecipe recipe : villager.getRecipes()) {
             shopItems.add(recipe.getResult());
@@ -78,14 +83,17 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
     }
 
     private void updateShopItems(Set<ItemStack> adaptList, Player player, String name) {
-
+        System.out.println("[DEBUG] TEST5");
         boolean anyUpdate = false;
         int i = 0;
         for (ItemStack storageContent : player.getInventory().getStorageContents()) {
             if (storageContent == null) continue;
             for (ItemStack shopItem : adaptList) {
+                System.out.println("[DEBUG] TEST6");
                 if (isStandardSimilar(storageContent, shopItem)) { // 标准检查下相同的话
+                    System.out.println("[DEBUG] TEST7");
                     if (!storageContent.isSimilar(shopItem)) { // 但非标准检查并不相同
+                        System.out.println("[DEBUG] TEST8");
                         // 同步玩家背包中的物品的 NBT 数据和商店的保持同步
                         anyUpdate = true;
                         storageContent.setItemMeta(shopItem.getItemMeta());
@@ -115,11 +123,35 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
     }
 
     private boolean isStandardSimilar(ItemStack stack1, ItemStack stack2) {
-        stack1 = stack1.clone();
-        stack2 = stack2.clone();
-        stack1.setAmount(1);
-        stack2.setAmount(1);
-        return standardItemStack(stack1).isSimilar(standardItemStack(stack2));
+        ItemMeta meta1 = stack1.getItemMeta();
+        ItemMeta meta2 = stack2.getItemMeta();
+        if (meta1.hasDisplayName() != meta2.hasDisplayName()) {
+            return false;
+        }
+        if (meta1.hasLore() != meta2.hasLore()) {
+            return false;
+        }
+        if (meta1.hasDisplayName() && meta2.hasDisplayName()) {
+            if (!meta1.getDisplayName().equals(meta2.getDisplayName())) {
+                return false;
+            }
+            System.out.println("[DEBUG] TEST9 " + meta1.getDisplayName() + " AND " + meta2.getDisplayName());
+        }
+        List<String> lore1 = meta1.getLore();
+        List<String> lore2 = meta2.getLore();
+        if (lore1 != null && lore2 != null) {
+            lore1.replaceAll(ChatColor::stripColor);
+            lore2.replaceAll(ChatColor::stripColor);
+            System.out.println("[DEBUG] TEST10 " + lore1 + " AND " + lore2);
+            if (!lore1.equals(lore2)) {
+                return false;
+            }
+            System.out.println("[DEBUG] TEST11");
+        }
+        if (!meta1.getItemFlags().equals(meta2.getItemFlags())) {
+            return false;
+        }
+        return true;
     }
 
     private ItemStack standardItemStack(ItemStack original) {
