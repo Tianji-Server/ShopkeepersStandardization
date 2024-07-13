@@ -126,7 +126,7 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
         stack2 = stack2.clone();
         stack1.setAmount(1);
         stack2.setAmount(1);
-        System.out.println("[DEBUG] TEST9 COMPARE: " + standardItemStack(stack1).toString() + " and " +  standardItemStack(stack2).toString());
+        System.out.println("[DEBUG] TEST9 COMPARE: " + standardItemStack(stack1).getItemMeta().toString() + " AND " +  standardItemStack(stack2).getItemMeta().toString());
         return standardItemStack(stack1).isSimilar(standardItemStack(stack2));
     }
 
