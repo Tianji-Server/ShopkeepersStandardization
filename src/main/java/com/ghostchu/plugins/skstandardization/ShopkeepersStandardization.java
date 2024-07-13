@@ -88,8 +88,11 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
         for (ItemStack storageContent : player.getInventory().getStorageContents()) {
             if (storageContent == null) continue;
             for (ItemStack shopItem : adaptList) {
+                System.out.println("[DEBUG] TEST6");
                 if (isStandardSimilar(storageContent, shopItem)) { // 标准检查下相同的话
+                    System.out.println("[DEBUG] TEST7");
                     if (!storageContent.isSimilar(shopItem)) { // 但非标准检查并不相同
+                        System.out.println("[DEBUG] TEST8");
                         // 同步玩家背包中的物品的 NBT 数据和商店的保持同步
                         anyUpdate = true;
                         storageContent.setItemMeta(shopItem.getItemMeta());
@@ -123,6 +126,7 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
         stack2 = stack2.clone();
         stack1.setAmount(1);
         stack2.setAmount(1);
+        System.out.println("[DEBUG] TEST9 COMPARE: " + standardItemStack(stack1).toString() + " and " +  standardItemStack(stack2).toString());
         return standardItemStack(stack1).isSimilar(standardItemStack(stack2));
     }
 
