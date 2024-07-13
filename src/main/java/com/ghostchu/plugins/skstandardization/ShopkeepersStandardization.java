@@ -96,7 +96,6 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
         }
         if (anyUpdate) {
             player.updateInventory();
-            player.sendMessage(MiniMessage.miniMessage().deserialize(String.format(getConfig().getString("items-updated"), i)));
             getLogger().info("更新了玩家 "+player.getName()+" 的 "+i+" 个物品，以修复和 "+name+" 的交易");
         }
     }
