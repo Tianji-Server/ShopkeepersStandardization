@@ -44,9 +44,11 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
 
     @EventHandler(ignoreCancelled = true)
     public void onShopkeeperOpening(ShopkeeperOpenUIEvent event) {
+        System.out.println("[DEBUG] TEST1");
         if (!DefaultUITypes.TRADING().equals(event.getUIType())) {
             return;
         }
+        System.out.println("[DEBUG] TEST2");
         Shopkeeper shopkeeper = event.getShopkeeper();
         Player player = event.getPlayer();
 
@@ -63,9 +65,11 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
     }
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onVillagerUI(PlayerInteractEntityEvent event){
+        System.out.println("[DEBUG] TEST3");
         if(!(event.getRightClicked() instanceof Villager villager)){
             return;
         }
+        System.out.println("[DEBUG] TEST4");
         Set<ItemStack> shopItems = new LinkedHashSet<>(); // 等待检查列表
         for (MerchantRecipe recipe : villager.getRecipes()) {
             shopItems.add(recipe.getResult());
@@ -78,7 +82,7 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
     }
 
     private void updateShopItems(Set<ItemStack> adaptList, Player player, String name) {
-
+        System.out.println("[DEBUG] TEST5");
         boolean anyUpdate = false;
         int i = 0;
         for (ItemStack storageContent : player.getInventory().getStorageContents()) {
