@@ -7,8 +7,8 @@ import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -35,7 +35,7 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
         saveDefaultConfig();
         reloadConfig();
         Bukkit.getPluginManager().registerEvents(this, this);
-        Metrics metrics = new Metrics(this,20812);
+        Metrics metrics = new Metrics(this, 20812);
     }
 
     @Override
@@ -62,16 +62,17 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
 
         this.updateShopItems(shopItems, player, shopkeeper.getName());
     }
+
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    public void onVillagerUI(PlayerInteractEntityEvent event){
-        if(!(event.getRightClicked() instanceof Villager villager)){
+    public void onVillagerUI(PlayerInteractEntityEvent event) {
+        if (!(event.getRightClicked() instanceof Villager villager)) {
             return;
         }
         Set<ItemStack> shopItems = new LinkedHashSet<>(); // 等待检查列表
         for (MerchantRecipe recipe : villager.getRecipes()) {
             shopItems.add(recipe.getResult());
             shopItems.addAll(recipe.getIngredients());
-            if(recipe.getAdjustedIngredient1() != null){
+            if (recipe.getAdjustedIngredient1() != null) {
                 shopItems.add(recipe.getAdjustedIngredient1());
             }
         }
@@ -90,13 +91,15 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
                         anyUpdate = true;
                         storageContent.setItemMeta(shopItem.getItemMeta());
                         i++;
+                        break;
                     }
                 }
             }
         }
         if (anyUpdate) {
             player.updateInventory();
-            getLogger().info("更新了玩家 "+player.getName()+" 的 "+i+" 个物品，以修复和 "+name+" 的交易");
+            player.sendMessage(MiniMessage.miniMessage().deserialize(String.format(getConfig().getString("items-updated"), i)));
+            getLogger().info("更新了玩家 " + player.getName() + " 的 " + i + " 个物品，以修复和 " + name + " 的交易");
         }
     }
 
@@ -114,32 +117,19 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
     }
 
     private boolean isStandardSimilar(ItemStack stack1, ItemStack stack2) {
-        ItemMeta meta1 = stack1.getItemMeta();
-        ItemMeta meta2 = stack2.getItemMeta();
-        if (meta1.hasDisplayName() != meta2.hasDisplayName()) {
-            return false;
-        }
-        if (meta1.hasLore() != meta2.hasLore()) {
-            return false;
-        }
-        if (meta1.hasDisplayName() && meta2.hasDisplayName()) {
-            if (!meta1.getDisplayName().equals(meta2.getDisplayName())) {
-                return false;
-            }
-        }
-        List<String> lore1 = meta1.getLore();
-        List<String> lore2 = meta2.getLore();
+        stack1 = stack1.clone();
+        stack2 = stack2.clone();
+        stack1.setAmount(1);
+        stack2.setAmount(1);
+        List<String> lore1 = stack1.getLore();
+        List<String> lore2 = stack2.getLore();
         if (lore1 != null && lore2 != null) {
             lore1.replaceAll(ChatColor::stripColor);
             lore2.replaceAll(ChatColor::stripColor);
-            if (!lore1.equals(lore2)) {
-                return false;
-            }
+            stack1.setLore(lore1);
+            stack2.setLore(lore2);
         }
-        if (!meta1.getItemFlags().equals(meta2.getItemFlags())) {
-            return false;
-        }
-        return true;
+        return standardItemStack(stack1).isSimilar(standardItemStack(stack2));
     }
 
     private ItemStack standardItemStack(ItemStack original) {
