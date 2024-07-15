@@ -117,8 +117,8 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
     }
 
     private boolean isStandardSimilar(ItemStack stack1, ItemStack stack2) {
-        stack1 = stack1.clone();
-        stack2 = stack2.clone();
+        stack1 = standardItemStack(stack1);
+        stack2 = standardItemStack(stack2);
         stack1.setAmount(1);
         stack2.setAmount(1);
         List<String> lore1 = stack1.getLore();
@@ -129,7 +129,7 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
             stack1.setLore(lore1);
             stack2.setLore(lore2);
         }
-        return standardItemStack(stack1).isSimilar(standardItemStack(stack2));
+        return stack1.isSimilar(stack2);
     }
 
     private ItemStack standardItemStack(ItemStack original) {
