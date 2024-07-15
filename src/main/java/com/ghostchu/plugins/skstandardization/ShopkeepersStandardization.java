@@ -63,21 +63,23 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
         this.updateShopItems(shopItems, player, shopkeeper.getName());
     }
 
+    /*
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    public void onVillagerUI(PlayerInteractEntityEvent event) {
-        if (!(event.getRightClicked() instanceof Villager villager)) {
+    public void onVillagerUI(PlayerInteractEntityEvent event){
+        if(!(event.getRightClicked() instanceof Villager villager)){
             return;
         }
         Set<ItemStack> shopItems = new LinkedHashSet<>(); // 等待检查列表
         for (MerchantRecipe recipe : villager.getRecipes()) {
             shopItems.add(recipe.getResult());
             shopItems.addAll(recipe.getIngredients());
-            if (recipe.getAdjustedIngredient1() != null) {
+            if(recipe.getAdjustedIngredient1() != null){
                 shopItems.add(recipe.getAdjustedIngredient1());
             }
         }
         this.updateShopItems(shopItems, event.getPlayer(), event.getRightClicked().getName());
     }
+     */
 
     private void updateShopItems(Set<ItemStack> adaptList, Player player, String name) {
         boolean anyUpdate = false;
@@ -117,19 +119,32 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
     }
 
     private boolean isStandardSimilar(ItemStack stack1, ItemStack stack2) {
-        stack1 = standardItemStack(stack1);
-        stack2 = standardItemStack(stack2);
-        stack1.setAmount(1);
-        stack2.setAmount(1);
-        List<String> lore1 = stack1.getLore();
-        List<String> lore2 = stack2.getLore();
+        ItemMeta meta1 = stack1.getItemMeta();
+        ItemMeta meta2 = stack2.getItemMeta();
+        if (meta1.hasDisplayName() != meta2.hasDisplayName()) {
+            return false;
+        }
+        if (meta1.hasLore() != meta2.hasLore()) {
+            return false;
+        }
+        if (meta1.hasDisplayName() && meta2.hasDisplayName()) {
+            if (!meta1.getDisplayName().equals(meta2.getDisplayName())) {
+                return false;
+            }
+        }
+        List<String> lore1 = meta1.getLore();
+        List<String> lore2 = meta2.getLore();
         if (lore1 != null && lore2 != null) {
             lore1.replaceAll(ChatColor::stripColor);
             lore2.replaceAll(ChatColor::stripColor);
-            stack1.setLore(lore1);
-            stack2.setLore(lore2);
+            if (!lore1.equals(lore2)) {
+                return false;
+            }
         }
-        return stack1.isSimilar(stack2);
+        if (!meta1.getItemFlags().equals(meta2.getItemFlags())) {
+            return false;
+        }
+        return true;
     }
 
     private ItemStack standardItemStack(ItemStack original) {
