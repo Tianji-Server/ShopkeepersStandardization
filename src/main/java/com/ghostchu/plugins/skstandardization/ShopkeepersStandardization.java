@@ -115,6 +115,9 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
     }
 
     private boolean isStandardSimilar(ItemStack stack1, ItemStack stack2) {
+        if (!stack1.getData().equals(stack2.getData())) {
+            return false;
+        }
         ItemMeta meta1 = stack1.getItemMeta();
         ItemMeta meta2 = stack2.getItemMeta();
         if (meta1.hasDisplayName() != meta2.hasDisplayName()) {
@@ -143,7 +146,7 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
         if (!meta1.getEnchants().equals(meta2.getEnchants())) {
             return false;
         }
-        return meta1.getAttributeModifiers().equals(meta2.getAttributeModifiers());
+        return true;
     }
 
     private ItemStack standardItemStack(ItemStack original) {
