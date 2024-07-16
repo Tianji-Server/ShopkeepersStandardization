@@ -126,6 +126,12 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
         if (meta1.hasLore() != meta2.hasLore()) {
             return false;
         }
+        if (!meta1.hasDisplayName() && !meta1.hasLore()) {
+            return false;
+        }
+        if (!meta2.hasDisplayName() && !meta2.hasLore()) {
+            return false;
+        }
         if (meta1.hasDisplayName() && meta2.hasDisplayName()) {
             if (!meta1.getDisplayName().equals(meta2.getDisplayName())) {
                 return false;
