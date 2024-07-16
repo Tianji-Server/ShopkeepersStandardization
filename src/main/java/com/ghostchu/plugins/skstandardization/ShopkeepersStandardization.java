@@ -12,13 +12,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -119,6 +115,9 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
     }
 
     private boolean isStandardSimilar(ItemStack stack1, ItemStack stack2) {
+        if (!stack1.getData().equals(stack2.getData())) {
+            return false;
+        }
         ItemMeta meta1 = stack1.getItemMeta();
         ItemMeta meta2 = stack2.getItemMeta();
         if (meta1.hasDisplayName() != meta2.hasDisplayName()) {
@@ -142,6 +141,9 @@ public final class ShopkeepersStandardization extends JavaPlugin implements List
             }
         }
         if (!meta1.getItemFlags().equals(meta2.getItemFlags())) {
+            return false;
+        }
+        if (!meta1.getEnchants().equals(meta2.getEnchants())) {
             return false;
         }
         return true;
