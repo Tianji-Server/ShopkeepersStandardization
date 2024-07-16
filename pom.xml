@@ -60,7 +60,7 @@
       </repository>
       <repository>
           <id>shopkeepers-repo</id>
-          <url>https://nexus.lichtspiele.org/repository/releases/</url>
+          <url>https://repo.projectshard.dev/repository/releases/</url>
       </repository>
   </repositories>
 
